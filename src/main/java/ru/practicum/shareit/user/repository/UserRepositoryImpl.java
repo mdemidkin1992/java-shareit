@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class UserRepositoryImpl implements UserRepository {
     private final Map<Long, User> userMap = new HashMap<>();
     private final Set<String> emailSet = new HashSet<>();
-    private static long count = 0;
+    private long count = 0;
 
     @Override
     public UserDto createUser(User user) {

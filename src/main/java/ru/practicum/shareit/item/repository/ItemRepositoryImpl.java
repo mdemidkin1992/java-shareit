@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemRepositoryImpl implements ItemRepository {
     private final Map<Long, Item> itemMap = new HashMap<>();
-    private static long count = 0;
+    private long count = 0;
 
     @Autowired
     private final UserRepository userRepository;
