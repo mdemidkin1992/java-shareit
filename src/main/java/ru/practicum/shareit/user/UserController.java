@@ -50,7 +50,7 @@ public class UserController {
     @PatchMapping("/{userId}")
     public UserDto updateUser(@PathVariable long userId,
                               @RequestBody Map<String, String> fields) {
-        log.info("PATCH request received user with id: {}", userId );
+        log.info("PATCH request received user with id: {}", userId);
         UserDto response = userService.updateUser(userId, fields);
         log.info("Updated user: {}", response);
         return response;

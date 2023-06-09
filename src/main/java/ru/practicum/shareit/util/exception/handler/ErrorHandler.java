@@ -37,7 +37,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handleAccessDenyException (final AccessDenyException e) {
+    public ErrorResponse handleAccessDenyException(final AccessDenyException e) {
         e.printStackTrace();
         return new ErrorResponse(e.getMessage());
     }
