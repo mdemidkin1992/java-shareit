@@ -31,16 +31,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ItemControllerTest extends CrudOperations {
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    ItemService itemService;
+    private ItemService itemService;
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @Test
     public void shouldGetItemWhenIdIsCorrect() throws Exception {

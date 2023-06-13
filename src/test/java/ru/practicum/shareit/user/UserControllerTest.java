@@ -30,13 +30,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerTest extends CrudOperations {
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @Test
     public void shouldNotCreateUserWhenEmailAlreadyExists() throws Exception {

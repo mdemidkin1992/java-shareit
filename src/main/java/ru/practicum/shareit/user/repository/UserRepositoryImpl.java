@@ -17,8 +17,9 @@ public class UserRepositoryImpl implements UserRepository {
     private long count = 0;
 
     @Override
-    public UserDto createUser(User user) {
-        checkIfEmailExists(user.getEmail());
+    public UserDto createUser(UserDto userDto) {
+        checkIfEmailExists(userDto.getEmail());
+        User user = UserMapper.fromUserDto(userDto);
         user.setId(++count);
         userMap.put(user.getId(), user);
         emailSet.add(user.getEmail());
@@ -50,10 +51,10 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public UserDto updateUser(long userId, Map<String, String> fields) {
+    public UserDto updateUser(long userId, UserDto userDto) {
         try {
             User targetUser = UserMapper.fromUserDto(getUserById(userId));
-            updateUserFields(targetUser, fields);
+            updateUserFields(targetUser, userDto);
             userMap.put(targetUser.getId(), targetUser);
         } catch (UserNotFoundException e) {
             String message = String.format("User with id %s not found", userId);
@@ -62,19 +63,17 @@ public class UserRepositoryImpl implements UserRepository {
         return getUserById(userId);
     }
 
-    private void updateUserFields(User user, Map<String, String> fields) {
-        for (Map.Entry<String, String> entry : fields.entrySet()) {
-            switch (entry.getKey()) {
-                case "name":
-                    user.setName(entry.getValue());
-                    break;
-                case "email":
-                    checkIfEmailExists(entry.getValue());
-                    emailSet.remove(user.getEmail());
-                    user.setEmail(entry.getValue());
-                    emailSet.add(user.getName());
-                    break;
+    private void updateUserFields(User user, UserDto userDto) {
+        if (userDto.getName() != null) {
+            user.setName(userDto.getName());
+        }
+        if (userDto.getEmail() != null) {
+            if (!user.getEmail().equals(userDto.getEmail())) {
+                checkIfEmailExists(userDto.getEmail());
             }
+            emailSet.remove(user.getEmail());
+            user.setEmail(userDto.getEmail());
+            emailSet.add(user.getEmail());
         }
     }
 

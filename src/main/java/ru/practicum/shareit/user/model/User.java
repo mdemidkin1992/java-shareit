@@ -10,12 +10,11 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class User {
 
-    @NotNull
-    long id;
+    private long id;
 
-    String name;
+    private String name;
 
     @NotNull
     @Email(message = "User email is of invalid format")
-    String email;
+    private String email;
 }

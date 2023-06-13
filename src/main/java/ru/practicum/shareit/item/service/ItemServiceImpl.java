@@ -1,19 +1,16 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.repository.ItemRepository;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    @Autowired
     private final ItemRepository itemRepository;
 
     @Override
@@ -37,8 +34,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto updateItem(long itemId, long ownerId, Map<String, String> fields) {
-        return itemRepository.updateItem(itemId, ownerId, fields);
+    public ItemDto updateItem(long itemId, long ownerId, ItemDto itemDto) {
+        return itemRepository.updateItem(itemId, ownerId, itemDto);
     }
 
     @Override

@@ -2,7 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -10,15 +10,14 @@ import ru.practicum.shareit.item.service.ItemService;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class ItemController {
 
-    @Autowired
     private final ItemService itemService;
 
     @PostMapping
@@ -49,9 +48,9 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@PathVariable long itemId,
                               @RequestHeader("X-Sharer-User-Id") long ownerId,
-                              @RequestBody Map<String, String> fields) {
+                              @RequestBody ItemDto itemDto) {
         log.info("PATCH request received item with id: {}", itemId);
-        ItemDto response = itemService.updateItem(itemId, ownerId, fields);
+        ItemDto response = itemService.updateItem(itemId, ownerId, itemDto);
         log.info("Updated user: {}", response);
         return response;
     }

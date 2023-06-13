@@ -2,30 +2,28 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class UserController {
 
-    @Autowired
     private final UserService userService;
 
     @PostMapping
-    public UserDto createUser(@NotNull @RequestBody @Valid User user) {
-        log.info("POST request received new user: {}", user);
-        UserDto response = userService.createUser(user);
+    public UserDto createUser(@NotNull @RequestBody @Valid UserDto userDto) {
+        log.info("POST request received new user: {}", userDto);
+        UserDto response = userService.createUser(userDto);
         log.info("User created: {}", response);
         return response;
     }
@@ -49,9 +47,9 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public UserDto updateUser(@PathVariable long userId,
-                              @RequestBody Map<String, String> fields) {
+                              @RequestBody UserDto userDto) {
         log.info("PATCH request received user with id: {}", userId);
-        UserDto response = userService.updateUser(userId, fields);
+        UserDto response = userService.updateUser(userId, userDto);
         log.info("Updated user: {}", response);
         return response;
     }
