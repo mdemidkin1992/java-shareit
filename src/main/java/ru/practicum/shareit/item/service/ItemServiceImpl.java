@@ -170,11 +170,11 @@ public class ItemServiceImpl implements ItemService {
 
         Comment comment = CommentMapper.fromCommentRequestDto(commentRequestDto);
 
-        ZoneId ZONE_ID = ZoneId.of("Europe/Moscow");
-        ZonedDateTime moscowDateTime = ZonedDateTime.now(ZONE_ID);
+        ZoneId zoneId = ZoneId.of("Europe/Moscow");
+        ZonedDateTime moscowDateTime = ZonedDateTime.now(zoneId);
         comment.setCreated(moscowDateTime.plusMinutes(1));
 
-        if (ZonedDateTime.of(booking.getEnd(), ZONE_ID).isAfter(comment.getCreated())) {
+        if (ZonedDateTime.of(booking.getEnd(), zoneId).isAfter(comment.getCreated())) {
             throw new CommentNotAuthorisedException("Comment field created must be after booking end");
         }
         if (comment.getText().isEmpty()) {
