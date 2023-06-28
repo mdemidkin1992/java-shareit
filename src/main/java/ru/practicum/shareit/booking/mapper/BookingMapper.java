@@ -3,13 +3,11 @@ package ru.practicum.shareit.booking.mapper;
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.StatusType;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,17 +40,6 @@ public class BookingMapper {
                 .collect(Collectors.toList());
     }
 
-    public static Booking fromBookingDto(BookingDtoResponse bookingDto) {
-        Booking booking = new Booking();
-        booking.setId(bookingDto.getId());
-        booking.setStatus(bookingDto.getStatus() != null ? StatusType.valueOf(bookingDto.getStatus()) : null);
-        booking.setStart(bookingDto.getStart() != null ? getDateTime(bookingDto.getStart()) : null);
-        booking.setEnd(bookingDto.getEnd() != null ? getDateTime(bookingDto.getEnd()) : null);
-        booking.setItem(bookingDto.getItem() != null ? ItemMapper.fromItemDto(bookingDto.getItem()) : null);
-        booking.setBooker(bookingDto.getBooker() != null ? UserMapper.fromUserDto(bookingDto.getBooker()) : null);
-        return booking;
-    }
-
     public static Booking fromBookingDtoRequest(ru.practicum.shareit.booking.dto.BookingDtoRequest dto, User booker, Item item) {
         Booking booking = new Booking();
         booking.setItem(item);
@@ -60,11 +47,6 @@ public class BookingMapper {
         booking.setStart(dto.getStart());
         booking.setEnd(dto.getEnd());
         return booking;
-    }
-
-    private static LocalDateTime getDateTime(String dateTimeString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-        return LocalDateTime.parse(dateTimeString, formatter);
     }
 
 }

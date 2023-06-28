@@ -10,13 +10,10 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "users")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
-
     @NotNull
     @Email(message = "User email is of invalid format")
     private String email;

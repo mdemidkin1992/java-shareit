@@ -5,7 +5,6 @@ import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class DateTimeRangeValidator implements ConstraintValidator<DateTimeRange, Object> {
 
@@ -31,9 +30,4 @@ public class DateTimeRangeValidator implements ConstraintValidator<DateTimeRange
                 && start.isAfter(now);
     }
 
-    private static LocalDateTime getDateTime(String dateTimeString) {
-        if (dateTimeString.isEmpty()) return null;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-        return LocalDateTime.parse(dateTimeString, formatter);
-    }
 }

@@ -14,6 +14,7 @@ import ru.practicum.shareit.user.model.User;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class CrudOperations {
@@ -24,13 +25,13 @@ public class CrudOperations {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public UserDto createUser(User user) throws Exception {
+    public UserDto createUser(UserDto userDto) throws Exception {
         MvcResult result = mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user)))
+                        .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(user.getName()))
-                .andExpect(jsonPath("$.email").value(user.getEmail()))
+                .andExpect(jsonPath("$.name").value(userDto.getName()))
+                .andExpect(jsonPath("$.email").value(userDto.getEmail()))
                 .andReturn();
         return objectMapper.readValue(
                 result.getResponse().getContentAsString(),
@@ -52,6 +53,13 @@ public class CrudOperations {
                 result.getResponse().getContentAsString(),
                 ItemDto.class
         );
+    }
+
+    public User constructUser(String name, String email) {
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        return user;
     }
 
 }

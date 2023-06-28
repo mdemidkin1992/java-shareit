@@ -32,15 +32,13 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDtoResponse createBooking(BookingDtoRequest bookingDto, long userId) {
-        User booker = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
-        Item item = itemRepository.findById(bookingDto.getItemId())
-                .orElseThrow(() -> new ItemNotFoundException(("Item with id " + bookingDto.getItemId() + " not found")));
+        User booker = checkPresenceAndReturnUserOrElseThrow(userId);
+        Item item = checkPresenceAndReturnItemOrElseThrow(bookingDto.getItemId());
+
         if (!item.getAvailable())
             throw new ItemNotAvailbaleException("Item with id " + bookingDto.getItemId() + " is NOT AVAILABLE");
-        if (item.getOwner().getId().equals(booker.getId())) {
+        if (item.getOwner().getId().equals(booker.getId()))
             throw new BookingNotFoundException("Owner can't book it's own item");
-        }
 
         Booking booking = BookingMapper.fromBookingDtoRequest(bookingDto, booker, item);
         booking.setStatus(StatusType.WAITING);
@@ -51,19 +49,18 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDtoResponse updateBooking(long bookingId, Boolean approved, long userId) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new BookingNotFoundException("Booking with id " + bookingId + " not found"));
-        if (booking.getItem().getOwner().getId() != userId) {
-            throw new AccessDenyException("User with id " + userId + " is not the owner of item");
-        }
-        if ((String.valueOf(booking.getStatus()).equals("APPROVED") && approved)
-                || (String.valueOf(booking.getStatus()).equals("REJECTED") && !approved)) {
-            throw new UnsupportedStateException("Booking status has already been changed.");
-        }
-        bookingRepository.updateBookingStatusById(bookingId, approved);
+        checkPresenceAndReturnUserOrElseThrow(userId);
+        Booking booking = checkPresenceAndReturnBookingOrElseThrow(bookingId);
 
+        if (booking.getItem().getOwner().getId() != userId)
+            throw new AccessDenyException("User with id " + userId + " is not the owner of item");
+
+        if ((String.valueOf(booking.getStatus()).equals("APPROVED") && approved)
+                || (String.valueOf(booking.getStatus()).equals("REJECTED") && !approved))
+            throw new UnsupportedStateException("Booking status has already been changed.");
+
+
+        bookingRepository.updateBookingStatusById(bookingId, approved);
         BookingDtoResponse dto = BookingMapper.toBookingDto((Objects.requireNonNull(bookingRepository.findById(bookingId).orElse(null))));
         if (approved) dto.setStatus(String.valueOf(StatusType.APPROVED));
         else dto.setStatus(String.valueOf(StatusType.REJECTED));
@@ -73,21 +70,19 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public BookingDtoResponse getBookingById(long bookingId, long userId) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new BookingNotFoundException("Booking with id " + bookingId + " not found"));
-        if (booking.getBooker().getId() != userId && booking.getItem().getOwner().getId() != userId) {
+        checkPresenceAndReturnUserOrElseThrow(userId);
+        Booking booking = checkPresenceAndReturnBookingOrElseThrow(bookingId);
+
+        if (booking.getBooker().getId() != userId && booking.getItem().getOwner().getId() != userId)
             throw new AccessDenyException("User with id " + userId + " is not the owner / booker of item");
-        }
+
         return BookingMapper.toBookingDto(booking);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<BookingDtoResponse> getBookingsByUserByState(String state, long userId) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
+        checkPresenceAndReturnUserOrElseThrow(userId);
 
         List<Booking> bookings;
 
@@ -118,8 +113,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public List<BookingDtoResponse> getOwnerItemsBooked(String state, long userId) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
+        checkPresenceAndReturnUserOrElseThrow(userId);
 
         List<Booking> bookings;
 
@@ -145,6 +139,21 @@ public class BookingServiceImpl implements BookingService {
         }
 
         return BookingMapper.toBookingDto(bookings);
+    }
+
+    private User checkPresenceAndReturnUserOrElseThrow(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
+    }
+
+    private Item checkPresenceAndReturnItemOrElseThrow(long itemId) {
+        return itemRepository.findById(itemId)
+                .orElseThrow(() -> new ItemNotFoundException(("Item with id " + itemId + " not found")));
+    }
+
+    private Booking checkPresenceAndReturnBookingOrElseThrow(long bookingId) {
+        return bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new BookingNotFoundException("Booking with id " + bookingId + " not found"));
     }
 
 }

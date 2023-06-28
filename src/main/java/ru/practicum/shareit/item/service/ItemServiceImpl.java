@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-//    private static final ZoneId ZONE_ID = ZoneId.of("Europe/Moscow");
 
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
@@ -41,8 +40,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto createItem(long ownerId, ItemDto itemDto) {
-        User user = userRepository.findById(ownerId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + ownerId + " not found"));
+        User user = checkPresenceAndReturnUserOrElseThrow(ownerId);
         Item item = ItemMapper.fromItemDto(itemDto);
         item.setOwner(user);
         itemRepository.save(item);
@@ -52,17 +50,24 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public ItemDto getItemById(long itemId, long ownerId) {
-        Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new ItemNotFoundException(String.format("Item with id %s not found", itemId)));
-
+        Item item = checkPresenceAndReturnItemOrElseThrow(itemId);
         ItemDto itemDto = ItemMapper.toItemDto(item);
-
         List<Comment> comments = commentRepository.findAllByItemId(itemId);
         itemDto.setComments(CommentMapper.toCommentResponseDto(comments));
 
         if (itemDto.getOwnerId() == ownerId) {
-            List<BookingClosest> nextBookingClosest = bookingRepository.findNextClosestBookingByOwnerId(ownerId, itemId);
-            List<BookingClosest> lastBookingClosest = bookingRepository.findLastClosestBookingByOwnerId(ownerId, itemId);
+
+            List<BookingClosest> nextBookingClosest = bookingRepository
+                    .findNextClosestBookingByOwnerId(
+                            ownerId,
+                            itemId
+                    );
+
+            List<BookingClosest> lastBookingClosest = bookingRepository
+                    .findLastClosestBookingByOwnerId(
+                            ownerId,
+                            itemId
+                    );
 
             if (!nextBookingClosest.isEmpty()) {
                 itemDto.setNextBooking(nextBookingClosest.get(0));
@@ -86,8 +91,17 @@ public class ItemServiceImpl implements ItemService {
 
         for (ItemDto i : itemDtos) {
 
-            List<BookingClosest> nextBookingClosest = bookingRepository.findNextClosestBookingByOwnerId(ownerId, i.getId());
-            List<BookingClosest> lastBookingClosest = bookingRepository.findLastClosestBookingByOwnerId(ownerId, i.getId());
+            List<BookingClosest> nextBookingClosest = bookingRepository
+                    .findNextClosestBookingByOwnerId(
+                            ownerId,
+                            i.getId()
+                    );
+
+            List<BookingClosest> lastBookingClosest = bookingRepository
+                    .findLastClosestBookingByOwnerId(
+                            ownerId,
+                            i.getId()
+                    );
 
             if (!nextBookingClosest.isEmpty()) {
                 i.setNextBooking(nextBookingClosest.get(0));
@@ -113,11 +127,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto updateItem(long itemId, long ownerId, ItemDto itemDto) {
-        userRepository.findById(ownerId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + ownerId + " not found"));
+        checkPresenceAndReturnUserOrElseThrow(ownerId);
         itemRepository.updateItemFields(ItemMapper.fromItemDto(itemDto), ownerId, itemId);
-        ItemDto updatedItemDto = ItemMapper.toItemDto(itemRepository.findById(itemId)
-                .orElseThrow(() -> new ItemNotFoundException(String.format("Item with id %s not found", itemId))));
+        ItemDto updatedItemDto = ItemMapper.toItemDto(checkPresenceAndReturnItemOrElseThrow(itemId));
         List<Comment> comments = commentRepository.findAllByItemId(itemId);
         updatedItemDto.setComments(CommentMapper.toCommentResponseDto(comments));
         return updatedItemDto;
@@ -126,9 +138,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public List<ItemDto> searchItems(String text) {
-        if (text.isEmpty()) {
-            return new ArrayList<>();
-        }
+        if (text.isEmpty()) return new ArrayList<>();
         List<Item> items = itemRepository.searchItemByNameOrDescription(text);
         List<Long> ids = getItemsIds(items);
         return combineItemsWithComments(items, ids);
@@ -143,15 +153,13 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public CommentResponseDto addComment(CommentRequestDto commentRequestDto, long bookerId, long itemId) {
-        User user = userRepository.findById(bookerId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + bookerId + " not found"));
-        Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new ItemNotFoundException(String.format("Item with id %s not found", itemId)));
+        User user = checkPresenceAndReturnUserOrElseThrow(bookerId);
+        Item item = checkPresenceAndReturnItemOrElseThrow(itemId);
 
         List<Booking> bookings = bookingRepository.findAllByBookerIdPast(bookerId);
-        if (bookings.isEmpty()) {
+
+        if (bookings.isEmpty())
             throw new CommentNotAuthorisedException("Booking from user " + bookerId + " for item " + itemId + " doesn't exist");
-        }
 
         Booking booking = new Booking();
         for (Booking b : bookings) {
@@ -162,10 +170,10 @@ public class ItemServiceImpl implements ItemService {
 
         Comment comment = CommentMapper.fromCommentRequestDto(commentRequestDto);
 
-        // TODO исправить
         ZoneId ZONE_ID = ZoneId.of("Europe/Moscow");
         ZonedDateTime moscowDateTime = ZonedDateTime.now(ZONE_ID);
         comment.setCreated(moscowDateTime.plusMinutes(1));
+
         if (ZonedDateTime.of(booking.getEnd(), ZONE_ID).isAfter(comment.getCreated())) {
             throw new CommentNotAuthorisedException("Comment field created must be after booking end");
         }
@@ -198,6 +206,16 @@ public class ItemServiceImpl implements ItemService {
             itemDtos.add(dto);
         }
         return itemDtos;
+    }
+
+    private User checkPresenceAndReturnUserOrElseThrow(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
+    }
+
+    private Item checkPresenceAndReturnItemOrElseThrow(long itemId) {
+        return itemRepository.findById(itemId)
+                .orElseThrow(() -> new ItemNotFoundException(("Item with id " + itemId + " not found")));
     }
 
 }
