@@ -9,7 +9,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -53,13 +52,6 @@ public class CrudOperations {
                 result.getResponse().getContentAsString(),
                 ItemDto.class
         );
-    }
-
-    public User constructUser(String name, String email) {
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        return user;
     }
 
 }
