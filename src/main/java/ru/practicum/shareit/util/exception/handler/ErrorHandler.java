@@ -15,13 +15,6 @@ import javax.validation.ConstraintViolationException;
 public class ErrorHandler {
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleValidationException(final ValidationException e) {
-        e.printStackTrace();
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleUserNotFoundException(final UserNotFoundException e) {
         e.printStackTrace();
@@ -45,6 +38,13 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleAccessDenyException(final AccessDenyException e) {
+        e.printStackTrace();
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleItemRequestNotFoundException(final ItemRequestNotFoundException e) {
         e.printStackTrace();
         return new ErrorResponse(e.getMessage());
     }
@@ -87,13 +87,6 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleCommentNotAuthorisedException(final CommentNotAuthorisedException e) {
-        e.printStackTrace();
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleBookingAlreadyExistsException(final BookingAlreadyExistsException e) {
         e.printStackTrace();
         return new ErrorResponse(e.getMessage());
     }

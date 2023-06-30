@@ -4,10 +4,9 @@ import lombok.Data;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
-//@Builder
 @Entity
 @Table(name = "requests")
 public class ItemRequest {
@@ -17,5 +16,5 @@ public class ItemRequest {
     private String description;
     @ManyToOne(fetch = FetchType.LAZY)
     private User requester;
-    private LocalDateTime created = LocalDateTime.now();
+    private ZonedDateTime created;
 }

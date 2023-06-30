@@ -7,7 +7,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import ru.practicum.shareit.booking.dto.BookingDtoRequest;
+import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.request.dto.ItemRequestDescription;
+import ru.practicum.shareit.request.dto.ItemRequestInfo;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -51,6 +55,39 @@ public class CrudOperations {
         return objectMapper.readValue(
                 result.getResponse().getContentAsString(),
                 ItemDto.class
+        );
+    }
+
+    public BookingDtoResponse createBooking(BookingDtoRequest bookingDto, long userId) throws Exception {
+        MvcResult result = mockMvc.perform(post("/bookings")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(bookingDto))
+                        .header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.start").value(String.valueOf(bookingDto.getStart())))
+                .andExpect(jsonPath("$.end").value(String.valueOf(bookingDto.getEnd())))
+                .andExpect(jsonPath("$.status").value("WAITING"))
+                .andReturn();
+        return objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                BookingDtoResponse.class
+        );
+    }
+
+    public ItemRequestInfo createItemRequest(
+            ItemRequestDescription requestDescription,
+            long userId
+    ) throws Exception {
+        MvcResult result = mockMvc.perform(post("/requests")
+                        .content(objectMapper.writeValueAsString(requestDescription))
+                        .contentType("application/json")
+                        .header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        return objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                ItemRequestInfo.class
         );
     }
 

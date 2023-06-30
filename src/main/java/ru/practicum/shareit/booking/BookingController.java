@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -58,10 +59,12 @@ public class BookingController {
     @GetMapping
     public List<BookingDtoResponse> getBookingsByUserByState(
             @RequestParam(defaultValue = "ALL", required = false) String state,
-            @RequestHeader("X-Sharer-User-Id") long userId
+            @RequestHeader("X-Sharer-User-Id") long userId,
+            @RequestParam(required = false, defaultValue = "0") @Min(0) int from,
+            @RequestParam(required = false, defaultValue = "10") @Min(0) int size
     ) {
         log.info("GET request received for bookings of user {}", userId);
-        List<BookingDtoResponse> response = bookingService.getBookingsByUserByState(state, userId);
+        List<BookingDtoResponse> response = bookingService.getBookingsByUserByState(state, userId, from, size);
         log.info("Bookings: {}", response);
         return response;
     }
@@ -69,10 +72,12 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingDtoResponse> getOwnerItemsBooked(
             @RequestParam(defaultValue = "ALL", required = false) String state,
-            @RequestHeader("X-Sharer-User-Id") long userId
+            @RequestHeader("X-Sharer-User-Id") long userId,
+            @RequestParam(required = false, defaultValue = "0") @Min(0) int from,
+            @RequestParam(required = false, defaultValue = "10") @Min(0) int size
     ) {
         log.info("GET request received for item booked of owner {}", userId);
-        List<BookingDtoResponse> response = bookingService.getOwnerItemsBooked(state, userId);
+        List<BookingDtoResponse> response = bookingService.getOwnerItemsBooked(state, userId, from, size);
         log.info("Bookings: {}", response);
         return response;
     }
