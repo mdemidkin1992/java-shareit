@@ -1,17 +1,17 @@
 package ru.practicum.shareit.user.repository;
 
-import ru.practicum.shareit.user.dto.UserDto;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import ru.practicum.shareit.user.model.User;
 
-import java.util.List;
+public interface UserRepository extends JpaRepository<User, Long> {
 
-public interface UserRepository {
-    UserDto createUser(UserDto userDto);
+    @Modifying
+    @Query("UPDATE User e SET " +
+            "e.name = CASE WHEN :#{#user.name} IS NOT NULL THEN :#{#user.name} ELSE e.name END, " +
+            "e.email = CASE WHEN :#{#user.email} IS NOT NULL THEN :#{#user.email} ELSE e.email END " +
+            "WHERE e.id = :userId")
+    void updateUserFields(User user, Long userId);
 
-    UserDto getUserById(long userId);
-
-    List<UserDto> getAllUsers();
-
-    void deleteUser(long userId);
-
-    UserDto updateUser(long userId, UserDto userDto);
 }

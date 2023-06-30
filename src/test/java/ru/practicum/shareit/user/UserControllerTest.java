@@ -6,14 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.util.CrudOperations;
 import ru.practicum.shareit.util.exception.UserNotFoundException;
-import ru.practicum.shareit.util.exception.ValidationException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,20 +39,19 @@ class UserControllerTest extends CrudOperations {
 
     @Test
     public void shouldNotCreateUserWhenEmailAlreadyExists() throws Exception {
-        createUser(User.builder().name("Mark").email("mark@email.com").build());
-        User newUser = User.builder().name("Bob").email("mark@email.com").build();
+        createUser(UserDto.builder().name("Mark").email("mark@email.com").build());
+        UserDto newUser = UserDto.builder().name("Bob").email("mark@email.com").build();
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUser)))
                 .andExpect(result -> assertTrue(result.getResolvedException()
-                        instanceof ValidationException));
+                        instanceof DataIntegrityViolationException));
     }
 
     @Test
     public void shouldGetUserWhenIdIsCorrect() throws Exception {
-        User user = User.builder().name("Mark").email("mark@email.com").build();
-        UserDto userDto = createUser(user);
+        UserDto userDto = createUser(UserDto.builder().name("Mark").email("mark@email.com").build());
 
         mockMvc.perform(get("/users/{userId}", userDto.getId())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -66,7 +64,7 @@ class UserControllerTest extends CrudOperations {
 
     @Test
     public void shouldThrowUserNotFoundExceptionWhenIdIsIncorrect() throws Exception {
-        createUser(User.builder().name("Mark").email("mark@email.com").build());
+        createUser(UserDto.builder().name("Mark").email("mark@email.com").build());
         long invalidId = 999;
 
         mockMvc.perform(get("/users/{userId}", invalidId)
@@ -77,8 +75,8 @@ class UserControllerTest extends CrudOperations {
 
     @Test
     public void shouldGetAllUsers() throws Exception {
-        createUser(User.builder().name("Mark").email("mark@email.com").build());
-        createUser(User.builder().name("Toma").email("toma@email.com").build());
+        createUser(UserDto.builder().name("Mark").email("mark@email.com").build());
+        createUser(UserDto.builder().name("Toma").email("toma@email.com").build());
 
         mockMvc.perform(get("/users")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -90,7 +88,7 @@ class UserControllerTest extends CrudOperations {
 
     @Test
     public void shouldDeleteUserWhenIdIsCorrect() throws Exception {
-        UserDto userDto = createUser(User.builder().name("Mark").email("mark@email.com").build());
+        UserDto userDto = createUser(UserDto.builder().name("Mark").email("mark@email.com").build());
         long validUserId = userDto.getId();
 
         mockMvc.perform(delete("/users/{userId}", validUserId)
@@ -109,7 +107,7 @@ class UserControllerTest extends CrudOperations {
 
     @Test
     public void shouldNotDeleteUserWhenIdIsIncorrect() throws Exception {
-        createUser(User.builder().name("Mark").email("mark@email.com").build());
+        createUser(UserDto.builder().name("Mark").email("mark@email.com").build());
         long invalidId = 999;
 
         mockMvc.perform(delete("/users/{userId}", invalidId)
@@ -120,7 +118,7 @@ class UserControllerTest extends CrudOperations {
 
     @Test
     public void shouldUpdateUserWhenValid() throws Exception {
-        UserDto userDto = createUser(User.builder().name("Mark").email("mark@email.com").build());
+        UserDto userDto = createUser(UserDto.builder().name("Mark").email("mark@email.com").build());
 
         Map<String, String> fields = new HashMap<>();
         fields.put("name", "New name");

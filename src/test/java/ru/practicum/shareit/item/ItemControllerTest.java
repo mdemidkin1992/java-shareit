@@ -10,11 +10,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.util.CrudOperations;
-import ru.practicum.shareit.util.exception.AccessDenyException;
 import ru.practicum.shareit.util.exception.ItemNotFoundException;
+import ru.practicum.shareit.util.exception.UserNotFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,13 +44,14 @@ class ItemControllerTest extends CrudOperations {
 
     @Test
     public void shouldGetItemWhenIdIsCorrect() throws Exception {
-        User user = User.builder().name("Mark").email("mark@email.com").build();
-        long ownerId = createUser(user).getId();
+        UserDto userDto = UserDto.builder().name("Mark").email("mark@email.com").build();
+        long ownerId = createUser(userDto).getId();
         ItemDto request = ItemDto.builder().name("Item").description("Description").available(true).build();
         ItemDto response = createItem(request, ownerId);
 
         mockMvc.perform(get("/items/{itemId}", response.getId())
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", String.valueOf(ownerId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(response.getId()))
                 .andExpect(jsonPath("$.name").value(response.getName()))
@@ -61,19 +62,20 @@ class ItemControllerTest extends CrudOperations {
 
     @Test
     public void shouldThrowItemNotFoundExceptionWhenIdIsIncorrect() throws Exception {
-        long ownerId = createUser(User.builder().name("Mark").email("mark@email.com").build()).getId();
+        long ownerId = createUser(UserDto.builder().name("Mark").email("mark@email.com").build()).getId();
         createItem(ItemDto.builder().name("Item").description("Description").available(true).build(), ownerId);
         long invalidId = 999;
 
         mockMvc.perform(get("/items/{itemId}", invalidId)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", String.valueOf(ownerId)))
                 .andExpect(result -> assertTrue(result.getResolvedException()
                         instanceof ItemNotFoundException));
     }
 
     @Test
     public void shouldGetAllItems() throws Exception {
-        long ownerId = createUser(User.builder().name("Mark").email("mark@email.com").build()).getId();
+        long ownerId = createUser(UserDto.builder().name("Mark").email("mark@email.com").build()).getId();
         createItem(ItemDto.builder().name("Item1").description("Description1").available(true).build(), ownerId);
         createItem(ItemDto.builder().name("Item2").description("Description2").available(true).build(), ownerId);
 
@@ -88,7 +90,7 @@ class ItemControllerTest extends CrudOperations {
 
     @Test
     public void shouldUpdateItemWhenValid() throws Exception {
-        long ownerId = createUser(User.builder().name("Mark").email("mark@email.com").build()).getId();
+        long ownerId = createUser(UserDto.builder().name("Mark").email("mark@email.com").build()).getId();
         ItemDto itemDto = createItem(ItemDto.builder().name("Item1").description("Description1").available(true).build(), ownerId);
 
         Map<String, String> fields = new HashMap<>();
@@ -110,7 +112,7 @@ class ItemControllerTest extends CrudOperations {
 
     @Test
     public void shouldThrowItemNotFoundExceptionWhenItemIdInvalid() throws Exception {
-        long ownerId = createUser(User.builder().name("Mark").email("mark@email.com").build()).getId();
+        long ownerId = createUser(UserDto.builder().name("Mark").email("mark@email.com").build()).getId();
         createItem(ItemDto.builder().name("Item").description("Description").available(true).build(), ownerId);
         long itemInvalidId = 999;
 
@@ -129,7 +131,7 @@ class ItemControllerTest extends CrudOperations {
 
     @Test
     public void shouldThrowUserNotFoundExceptionWhenUserIdInvalid() throws Exception {
-        long ownerId = createUser(User.builder().name("Mark").email("mark@email.com").build()).getId();
+        long ownerId = createUser(UserDto.builder().name("Mark").email("mark@email.com").build()).getId();
         long itemId = createItem(ItemDto.builder().name("Item").description("Description").available(true).build(), ownerId).getId();
         long ownerInvalidId = 999;
 
@@ -143,12 +145,12 @@ class ItemControllerTest extends CrudOperations {
                         .content(objectMapper.writeValueAsString(fields))
                         .header("X-Sharer-User-Id", String.valueOf(ownerInvalidId)))
                 .andExpect(result -> assertTrue(result.getResolvedException()
-                        instanceof AccessDenyException));
+                        instanceof UserNotFoundException));
     }
 
     @Test
     public void shouldGetSearchResultsWhenQueryNonEmpty() throws Exception {
-        long ownerId = createUser(User.builder().name("Mark").email("mark@email.com").build()).getId();
+        long ownerId = createUser(UserDto.builder().name("Mark").email("mark@email.com").build()).getId();
         createItem(ItemDto.builder().name("Item1").description("Description1").available(true).build(), ownerId);
         createItem(ItemDto.builder().name("Item2").description("Description2").available(true).build(), ownerId);
 
@@ -165,7 +167,7 @@ class ItemControllerTest extends CrudOperations {
 
     @Test
     public void shouldGetNoSearchResultsWhenQueryIsEmpty() throws Exception {
-        long ownerId = createUser(User.builder().name("Mark").email("mark@email.com").build()).getId();
+        long ownerId = createUser(UserDto.builder().name("Mark").email("mark@email.com").build()).getId();
         createItem(ItemDto.builder().name("Item1").description("Description1").available(true).build(), ownerId);
         createItem(ItemDto.builder().name("Item2").description("Description2").available(true).build(), ownerId);
 
@@ -182,7 +184,7 @@ class ItemControllerTest extends CrudOperations {
 
     @Test
     public void shouldDeleteItemWhenIdCorrect() throws Exception {
-        long ownerId = createUser(User.builder().name("Mark").email("mark@email.com").build()).getId();
+        long ownerId = createUser(UserDto.builder().name("Mark").email("mark@email.com").build()).getId();
         long itemId = createItem(ItemDto.builder().name("Item1").description("Description1").available(true).build(), ownerId).getId();
 
         mockMvc.perform(delete("/items/{itemId}", itemId)

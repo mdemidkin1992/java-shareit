@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentRequestDto;
+import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
@@ -30,9 +32,10 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable long itemId) {
+    public ItemDto getItemById(@PathVariable long itemId,
+                               @RequestHeader("X-Sharer-User-Id") long ownerId) {
         log.info("GET request received for item with id: {}", itemId);
-        ItemDto response = itemService.getItemById(itemId);
+        ItemDto response = itemService.getItemById(itemId, ownerId);
         log.info("{}", response);
         return response;
     }
@@ -68,6 +71,18 @@ public class ItemController {
         log.info("DELETE request received item with id: {}", itemId);
         itemService.deleteItem(itemId);
         log.info("Item with id {} deleted", itemId);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentResponseDto createCommentToItem(
+            @PathVariable long itemId,
+            @RequestHeader("X-Sharer-User-Id") long bookerId,
+            @RequestBody CommentRequestDto commentRequestDto
+    ) {
+        log.info("POST request received to post comment for item {}", itemId);
+        CommentResponseDto response = itemService.addComment(commentRequestDto, bookerId, itemId);
+        log.info("Comment {} from user {} for item {} created", commentRequestDto.getText(), bookerId, itemId);
+        return response;
     }
 
 }
