@@ -116,8 +116,7 @@ class BookingDataJpaTest {
     @SneakyThrows
     void findAllByBookerIdAndStatusOrderByStartDesc() {
         List<Booking> actual = bookingRepository
-                .findAllByBookerIdAndStatusOrderByStartDesc
-                        (
+                .findAllByBookerIdAndStatusOrderByStartDesc(
                                 bookerId,
                                 StatusType.REJECTED,
                                 PAGE
@@ -203,8 +202,7 @@ class BookingDataJpaTest {
     @SneakyThrows
     void findAllByItemOwnerIdAndStatusOrderByStartDesc() {
         List<Booking> actual = bookingRepository
-                .findAllByItemOwnerIdAndStatusOrderByStartDesc
-                        (
+                .findAllByItemOwnerIdAndStatusOrderByStartDesc(
                                 ownerId,
                                 StatusType.REJECTED,
                                 PAGE

@@ -130,8 +130,7 @@ class ItemRequestControllerTest extends CrudOperations {
                 .andDo(print())
                 .andReturn();
 
-        ItemRequestInfoWithItems actual = objectMapper.readValue
-                (
+        ItemRequestInfoWithItems actual = objectMapper.readValue(
                         result.getResponse().getContentAsString(),
                         ItemRequestInfoWithItems.class
                 );

@@ -108,8 +108,7 @@ class UserServiceUnitTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class,
-                () -> userService.updateUser
-                        (
+                () -> userService.updateUser(
                                 userId,
                                 UserMapper.toUserDto(newUser)
                         ));

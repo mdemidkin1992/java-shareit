@@ -58,8 +58,8 @@ public class ItemRequestController {
     @GetMapping("/{requestId}")
     public ItemRequestInfoWithItems getItemRequestById(
             @RequestHeader("X-Sharer-User-Id") long userId,
-            @PathVariable(name = "requestId") long requestId)
-    {
+            @PathVariable(name = "requestId") long requestId
+    ) {
         log.info("GET request received for Item Request: {}", requestId);
         ItemRequestInfoWithItems response = itemRequestService.getItemRequestById(userId, requestId);
         log.info("Item request {}: {}", requestId, response);

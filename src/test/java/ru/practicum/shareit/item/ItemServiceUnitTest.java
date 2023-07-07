@@ -348,8 +348,7 @@ class ItemServiceUnitTest {
 
         assertThrows(
                 CommentNotAuthorisedException.class,
-                () -> itemService.addComment
-                        (
+                () -> itemService.addComment(
                                 commentRequestDto,
                                 userId,
                                 itemId)
@@ -386,8 +385,7 @@ class ItemServiceUnitTest {
 
         assertThrows(
                 CommentNotAuthorisedException.class,
-                () -> itemService.addComment
-                        (
+                () -> itemService.addComment(
                                 commentRequestDto,
                                 userId,
                                 itemId)
@@ -424,8 +422,7 @@ class ItemServiceUnitTest {
 
         assertThrows(
                 CommentNotAuthorisedException.class,
-                () -> itemService.addComment
-                        (
+                () -> itemService.addComment(
                                 commentRequestDto,
                                 userId,
                                 itemId)
