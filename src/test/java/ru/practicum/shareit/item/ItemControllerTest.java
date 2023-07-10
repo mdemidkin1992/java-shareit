@@ -1,25 +1,37 @@
 package ru.practicum.shareit.item;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.StatusType;
+import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.item.dto.CommentRequestDto;
+import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.util.CrudOperations;
 import ru.practicum.shareit.util.exception.ItemNotFoundException;
 import ru.practicum.shareit.util.exception.UserNotFoundException;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -28,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ItemControllerTest extends CrudOperations {
 
     @Autowired
@@ -37,10 +50,13 @@ class ItemControllerTest extends CrudOperations {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private ItemService itemService;
+    private BookingRepository bookingRepository;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
+
+    @Autowired
+    private ItemRepository itemRepository;
 
     @Test
     public void shouldGetItemWhenIdIsCorrect() throws Exception {
@@ -202,10 +218,44 @@ class ItemControllerTest extends CrudOperations {
                 .andReturn();
     }
 
-    @AfterEach
-    public void afterEach() {
-        itemService.getItems().forEach(u -> itemService.deleteItem(u.getId()));
-        userService.getUsers().forEach(u -> userService.deleteUser(u.getId()));
+    @Test
+    @SneakyThrows
+    public void shouldAddComment() {
+        long ownerId = createUser(UserDto.builder().name("Mark").email("mark@email.com").build()).getId();
+        long bookerId = createUser(UserDto.builder().name("Toma").email("toma@email.com").build()).getId();
+        long itemId = createItem(ItemDto.builder().name("Item1").description("Description1").available(true).build(), ownerId).getId();
+
+        Optional<Item> item = itemRepository.findById(itemId);
+        Optional<User> booker = userRepository.findById(bookerId);
+
+        Booking booking = new Booking();
+        booking.setItem(item.get());
+        booking.setBooker(booker.get());
+        booking.setStatus(StatusType.WAITING);
+        booking.setStart(LocalDateTime.of(2023, 6, 1, 9, 0, 30));
+        booking.setEnd(LocalDateTime.of(2023, 6, 2, 9, 0, 30));
+
+        bookingRepository.save(booking);
+
+        CommentRequestDto commentRequestDto = new CommentRequestDto();
+        commentRequestDto.setText("comment");
+
+        MvcResult result = mockMvc.perform(post("/items/{itemId}/comment", itemId)
+                        .contentType("application/json")
+                        .header("X-Sharer-User-Id", String.valueOf(bookerId))
+                        .content(objectMapper.writeValueAsString(commentRequestDto)))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+
+        CommentResponseDto commentResponseDto = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                CommentResponseDto.class
+        );
+
+        assertEquals(commentResponseDto.getId(), 1L);
+        assertEquals(commentResponseDto.getText(), commentRequestDto.getText());
+        assertEquals(commentResponseDto.getAuthorName(), booking.getBooker().getName());
     }
 
 }

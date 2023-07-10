@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,51 +18,51 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "WHERE b.id = :bookingId")
     void updateBookingStatusById(Long bookingId, Boolean available);
 
-    List<Booking> findAllByBookerIdOrderByStartDesc(long bookerId);
+    List<Booking> findAllByBookerIdOrderByStartDesc(long bookerId, Pageable pageable);
 
-    List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(long bookerId, StatusType status);
+    List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(long bookerId, StatusType status, Pageable pageable);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.booker.id = :bookerId " +
             "AND b.start < CURRENT_TIMESTAMP " +
             "AND b.end > CURRENT_TIMESTAMP " +
             "ORDER BY b.start DESC")
-    List<Booking> findAllByBookerIdCurrent(long bookerId);
+    List<Booking> findAllByBookerIdCurrent(long bookerId, Pageable pageable);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.booker.id = :bookerId " +
             "AND b.end < CURRENT_TIMESTAMP " +
             "ORDER BY b.start DESC")
-    List<Booking> findAllByBookerIdPast(long bookerId);
+    List<Booking> findAllByBookerIdPast(long bookerId, Pageable pageable);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.booker.id = :bookerId " +
             "AND b.start > CURRENT_TIMESTAMP " +
             "ORDER BY b.start DESC")
-    List<Booking> findAllByBookerIdFuture(long bookerId);
+    List<Booking> findAllByBookerIdFuture(long bookerId, Pageable pageable);
 
-    List<Booking> findAllByItemOwnerIdOrderByStartDesc(long userId);
+    List<Booking> findAllByItemOwnerIdOrderByStartDesc(long userId, Pageable pageable);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = :ownerId " +
             "AND b.start < CURRENT_TIMESTAMP " +
             "AND b.end > CURRENT_TIMESTAMP " +
             "ORDER BY b.start DESC")
-    List<Booking> findAllByItemOwnerIdCurrentOrderByStartDesc(long ownerId);
+    List<Booking> findAllByItemOwnerIdCurrentOrderByStartDesc(long ownerId, Pageable pageable);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = :ownerId " +
             "AND b.end < CURRENT_TIMESTAMP " +
             "ORDER BY b.start DESC")
-    List<Booking> findAllByItemOwnerIdPastOrderByStartDesc(long ownerId);
+    List<Booking> findAllByItemOwnerIdPastOrderByStartDesc(long ownerId, Pageable pageable);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = :ownerId " +
             "AND b.start > CURRENT_TIMESTAMP " +
             "ORDER BY b.start DESC")
-    List<Booking> findAllByItemOwnerIdFutureOrderByStartDesc(long ownerId);
+    List<Booking> findAllByItemOwnerIdFutureOrderByStartDesc(long ownerId, Pageable pageable);
 
-    List<Booking> findAllByItemOwnerIdAndStatusOrderByStartDesc(long ownerId, StatusType status);
+    List<Booking> findAllByItemOwnerIdAndStatusOrderByStartDesc(long ownerId, StatusType status, Pageable pageable);
 
     @Query("SELECT new ru.practicum.shareit.booking.dto.BookingClosest(b.id, b.booker.id) " +
             "FROM Booking AS b " +

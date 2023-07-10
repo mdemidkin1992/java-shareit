@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingClosest;
@@ -15,16 +17,20 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.util.exception.CommentNotAuthorisedException;
 import ru.practicum.shareit.util.exception.ItemNotFoundException;
+import ru.practicum.shareit.util.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.util.exception.UserNotFoundException;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +42,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     @Transactional
@@ -43,7 +50,17 @@ public class ItemServiceImpl implements ItemService {
         User user = checkPresenceAndReturnUserOrElseThrow(ownerId);
         Item item = ItemMapper.fromItemDto(itemDto);
         item.setOwner(user);
-        itemRepository.save(item);
+        Long requestId = itemDto.getRequestId();
+        if (requestId != null) {
+            Optional<ItemRequest> maybeRequest = itemRequestRepository.findById(requestId);
+            if (maybeRequest.isPresent()) {
+                ItemRequest request = maybeRequest.get();
+                item.setRequest(request);
+            } else {
+                throw new ItemRequestNotFoundException("Item request " + requestId + " not found");
+            }
+        }
+        item = itemRepository.save(item);
         return ItemMapper.toItemDto(item);
     }
 
@@ -84,8 +101,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> getItemsByOwnerId(long ownerId) {
-        List<Item> items = itemRepository.findAllByOwnerId(ownerId);
+    public List<ItemDto> getItemsByOwnerId(long ownerId, int from, int size) {
+        Pageable page = PageRequest.of(from / size, size);
+        List<Item> items = itemRepository.findAllByOwnerId(ownerId, page);
         List<Long> ids = getItemsIds(items);
         List<ItemDto> itemDtos = combineItemsWithComments(items, ids);
 
@@ -137,9 +155,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> searchItems(String text) {
+    public List<ItemDto> searchItems(String text, int from, int size) {
         if (text.isEmpty()) return new ArrayList<>();
-        List<Item> items = itemRepository.searchItemByNameOrDescription(text);
+        Pageable page = PageRequest.of(from / size, size);
+        List<Item> items = itemRepository.searchItemByNameOrDescription(text, page);
         List<Long> ids = getItemsIds(items);
         return combineItemsWithComments(items, ids);
     }
@@ -156,7 +175,7 @@ public class ItemServiceImpl implements ItemService {
         User user = checkPresenceAndReturnUserOrElseThrow(bookerId);
         Item item = checkPresenceAndReturnItemOrElseThrow(itemId);
 
-        List<Booking> bookings = bookingRepository.findAllByBookerIdPast(bookerId);
+        List<Booking> bookings = bookingRepository.findAllByBookerIdPast(bookerId, PageRequest.of(0, 10));
 
         if (bookings.isEmpty())
             throw new CommentNotAuthorisedException("Booking from user " + bookerId + " for item " + itemId + " doesn't exist");
@@ -183,7 +202,7 @@ public class ItemServiceImpl implements ItemService {
 
         comment.setItem(item);
         comment.setAuthor(user);
-        commentRepository.save(comment);
+        comment = commentRepository.save(comment);
         return CommentMapper.toCommentResponseDto(comment);
     }
 
