@@ -8,8 +8,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class BookingClosest {
-    private final Long id;
-    private final Long bookerId;
+    private Long id;
+    private Long bookerId;
 
     public BookingClosest(Long id, Long bookerId) {
         this.id = id;
