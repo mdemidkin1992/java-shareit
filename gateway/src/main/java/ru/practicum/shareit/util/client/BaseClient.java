@@ -1,6 +1,5 @@
 package ru.practicum.shareit.util.client;
 
-import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -79,8 +78,7 @@ public class BaseClient {
                                                           String path,
                                                           Long userId,
                                                           @Nullable Map<String, Object> parameters,
-                                                          @Nullable T body)
-    {
+                                                          @Nullable T body) {
         HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders(userId));
 
         ResponseEntity<Object> shareitServerResponse;

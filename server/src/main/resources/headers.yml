@@ -1,0 +1,3 @@
+SPRING_DATASOURCE_URL: postgresql://localhost:5432/shareit
+USERNAME_DB: postgres
+PASSWORD_DB: iamroot

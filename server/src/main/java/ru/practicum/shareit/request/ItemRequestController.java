@@ -9,8 +9,6 @@ import ru.practicum.shareit.request.dto.ItemRequestInfo;
 import ru.practicum.shareit.request.dto.ItemRequestInfoWithItems;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.util.List;
 
 @Slf4j
@@ -25,7 +23,7 @@ public class ItemRequestController {
     @PostMapping
     public ItemRequestInfo createItemRequest(
             @RequestHeader("X-Sharer-User-Id") long userId,
-            @RequestBody @Valid ItemRequestDescription request
+            @RequestBody ItemRequestDescription request
     ) {
         log.info("POST request received for Item Request: {}", request);
         ItemRequestInfo response = itemRequestService.createNewItemRequest(userId, request);
@@ -46,8 +44,8 @@ public class ItemRequestController {
     @GetMapping("/all")
     public List<ItemRequestInfoWithItems> getOtherUsersItemRequests(
             @RequestHeader("X-Sharer-User-Id") long userId,
-            @RequestParam(required = false, defaultValue = "0") @Min(0) int from,
-            @RequestParam(required = false, defaultValue = "10") @Min(0) int size
+            @RequestParam int from,
+            @RequestParam int size
     ) {
         log.info("GET request received for other Item Request");
         List<ItemRequestInfoWithItems> response = itemRequestService.getOtherUsersItemRequests(userId, from, size);

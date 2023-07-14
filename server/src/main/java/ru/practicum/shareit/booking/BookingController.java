@@ -8,9 +8,6 @@ import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.service.BookingService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -24,7 +21,7 @@ public class BookingController {
 
     @PostMapping
     public BookingDtoResponse createBooking(
-            @RequestBody @Valid @NotNull BookingDtoRequest bookingDto,
+            @RequestBody BookingDtoRequest bookingDto,
             @RequestHeader("X-Sharer-User-Id") long userId
     ) {
         log.info("POST request received booking {}", bookingDto);
@@ -58,26 +55,28 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDtoResponse> getBookingsByUserByState(
-            @RequestParam(defaultValue = "ALL", required = false) String state,
+            @RequestParam String state,
             @RequestHeader("X-Sharer-User-Id") long userId,
-            @RequestParam(required = false, defaultValue = "0") @Min(0) int from,
-            @RequestParam(required = false, defaultValue = "10") @Min(0) int size
+            @RequestParam int from,
+            @RequestParam int size
     ) {
         log.info("GET request received for bookings of user {}", userId);
-        List<BookingDtoResponse> response = bookingService.getBookingsByUserByState(state, userId, from, size);
+        List<BookingDtoResponse> response = bookingService
+                .getBookingsByUserByState(state, userId, from, size);
         log.info("Bookings: {}", response);
         return response;
     }
 
     @GetMapping("/owner")
     public List<BookingDtoResponse> getOwnerItemsBooked(
-            @RequestParam(defaultValue = "ALL", required = false) String state,
+            @RequestParam String state,
             @RequestHeader("X-Sharer-User-Id") long userId,
-            @RequestParam(required = false, defaultValue = "0") @Min(0) int from,
-            @RequestParam(required = false, defaultValue = "10") @Min(0) int size
+            @RequestParam int from,
+            @RequestParam int size
     ) {
         log.info("GET request received for item booked of owner {}", userId);
-        List<BookingDtoResponse> response = bookingService.getOwnerItemsBooked(state, userId, from, size);
+        List<BookingDtoResponse> response = bookingService
+                .getOwnerItemsBooked(state, userId, from, size);
         log.info("Bookings: {}", response);
         return response;
     }
