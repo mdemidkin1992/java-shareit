@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDescription;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 @Controller
 @Validated
@@ -40,8 +41,8 @@ public class ItemRequestController {
     @GetMapping("/all")
     public ResponseEntity<Object> getOtherUsersItemRequests(
             @RequestHeader("X-Sharer-User-Id") long userId,
-            @RequestParam(required = false, defaultValue = "0") @Min(0) int from,
-            @RequestParam(required = false, defaultValue = "10") @Min(0) int size
+            @PositiveOrZero @RequestParam(required = false, defaultValue = "0") int from,
+            @Positive @RequestParam(required = false, defaultValue = "10") int size
     ) {
         log.info("GET request received for other Item Request");
         return itemRequestClient.getOtherUsersItemRequests(userId, from, size);

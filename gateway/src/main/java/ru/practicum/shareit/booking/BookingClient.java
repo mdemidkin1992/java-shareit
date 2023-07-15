@@ -7,8 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import ru.practicum.shareit.booking.dto.BookItemRequestDto;
-import ru.practicum.shareit.booking.dto.BookingState;
+import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.util.client.BaseClient;
 
 import java.util.Map;
@@ -28,12 +27,12 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getBookingsByUserByState(long userId,
-                                                           BookingState state,
+                                                           String state,
                                                            Integer from,
                                                            Integer size
     ) {
         Map<String, Object> parameters = Map.of(
-                "state", state.name(),
+                "state", state.toUpperCase(),
                 "from", from,
                 "size", size
         );
@@ -41,12 +40,12 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getOwnerItemsBooked(long userId,
-                                                      BookingState state,
+                                                      String state,
                                                       Integer from,
                                                       Integer size
     ) {
         Map<String, Object> parameters = Map.of(
-                "state", state.name(),
+                "state", state.toUpperCase(),
                 "from", from,
                 "size", size
         );
@@ -54,7 +53,7 @@ public class BookingClient extends BaseClient {
     }
 
 
-    public ResponseEntity<Object> bookItem(long userId, BookItemRequestDto requestDto) {
+    public ResponseEntity<Object> bookItem(long userId, BookingDtoRequest requestDto) {
         return post("", userId, requestDto);
     }
 
@@ -62,7 +61,10 @@ public class BookingClient extends BaseClient {
         return get("/" + bookingId, userId);
     }
 
-    public ResponseEntity<Object> updateBooking(long bookingId, boolean approved, long userId) {
-        return patch("/" + bookingId, userId, approved);
+    public ResponseEntity<Object> updateBooking(long bookingId, Boolean approved, long userId) {
+        Map<String, Object> parameters = Map.of(
+                "approved", approved
+        );
+        return patch("/" + bookingId + "/?approved={approved}", userId, parameters);
     }
 }
