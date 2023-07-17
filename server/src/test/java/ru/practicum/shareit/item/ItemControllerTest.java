@@ -97,7 +97,9 @@ class ItemControllerTest extends CrudOperations {
 
         mockMvc.perform(get("/items")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", String.valueOf(ownerId)))
+                        .header("X-Sharer-User-Id", String.valueOf(ownerId))
+                        .param("from", "0")
+                        .param("size", "10"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(2)))
@@ -174,7 +176,9 @@ class ItemControllerTest extends CrudOperations {
 
         mockMvc.perform(get("/items/search")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("text", text))
+                        .param("text", text)
+                        .param("from", "0")
+                        .param("size", "10"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(2)))
@@ -191,7 +195,9 @@ class ItemControllerTest extends CrudOperations {
 
         mockMvc.perform(get("/items/search")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("text", text))
+                        .param("text", text)
+                        .param("from", "0")
+                        .param("size", "10"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(0)))
@@ -211,7 +217,9 @@ class ItemControllerTest extends CrudOperations {
 
         mockMvc.perform(get("/items")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", String.valueOf(ownerId)))
+                        .header("X-Sharer-User-Id", String.valueOf(ownerId))
+                        .param("from", "0")
+                        .param("size", "10"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(0)))

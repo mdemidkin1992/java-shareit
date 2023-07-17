@@ -93,7 +93,9 @@ class ItemRequestControllerTest extends CrudOperations {
 
         MvcResult result = mockMvc.perform(get("/requests/all")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", String.valueOf(otherId)))
+                        .header("X-Sharer-User-Id", String.valueOf(otherId))
+                        .param("from", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andReturn();
