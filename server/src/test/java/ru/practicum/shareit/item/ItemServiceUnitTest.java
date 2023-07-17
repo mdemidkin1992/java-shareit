@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import ru.practicum.shareit.booking.dto.BookingClosest;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.dto.CommentRequestDto;
@@ -28,7 +27,6 @@ import ru.practicum.shareit.util.exception.CommentNotAuthorisedException;
 import ru.practicum.shareit.util.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.util.exception.UserNotFoundException;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -57,8 +55,6 @@ class ItemServiceUnitTest {
     private CommentRepository commentRepository;
     @Mock
     private ItemRequestRepository itemRequestRepository;
-
-    private static final LocalDateTime CURRENT_TIMESTAMP = LocalDateTime.now();
 
     @Test
     void createItem_whenUserIdInvalid_thenUserNotFoundException() {
