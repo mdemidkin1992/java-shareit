@@ -2,8 +2,8 @@ package ru.practicum.shareit.booking.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
-import ru.practicum.shareit.booking.dto.deserialiser.LocalDateTimeDeserializer;
 import ru.practicum.shareit.booking.dto.validator.DateTimeRange;
+import ru.practicum.shareit.booking.dto.deserialiser.LocalDateTimeDeserializer;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
