@@ -42,7 +42,6 @@ class BookingDataJpaTest {
 
     private static final int FROM = 0;
     private static final int SIZE = 10;
-    private static final LocalDateTime CURRENT_TIMESTAMP = LocalDateTime.now();
 
     private long bookingId1, bookingId2, bookingId3;
 

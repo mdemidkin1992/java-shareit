@@ -19,8 +19,10 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.util.exception.*;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -111,7 +113,9 @@ public class BookingServiceImpl implements BookingService {
                 throw new UnsupportedStateException("Unknown state: " + state);
         }
 
-        return BookingMapper.toBookingDto(bookings);
+        return BookingMapper.toBookingDto(bookings.stream()
+                .sorted(Comparator.comparingLong(Booking::getId))
+                .collect(Collectors.toList()));
     }
 
     @Override
