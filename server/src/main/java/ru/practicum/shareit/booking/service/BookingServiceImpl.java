@@ -114,7 +114,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         return BookingMapper.toBookingDto(bookings.stream()
-                .sorted(Comparator.comparingLong(Booking::getId))
+                .sorted(Comparator.comparing(Booking::getStart))
                 .collect(Collectors.toList()));
     }
 
