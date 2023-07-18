@@ -26,7 +26,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "WHERE b.booker.id = :bookerId " +
             "AND b.start < CURRENT_TIMESTAMP " +
             "AND b.end > CURRENT_TIMESTAMP " +
-            "ORDER BY b.start DESC")
+            "ORDER BY b.start ASC")
     List<Booking> findAllByBookerIdCurrent(long bookerId, Pageable pageable);
 
     @Query("SELECT b FROM Booking b " +
@@ -70,7 +70,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "AND b.status = 'APPROVED' " +
             "AND b.item.id = :itemId " +
             "AND b.start > CURRENT_TIMESTAMP " +
-            "ORDER BY b.start DESC ")
+            "ORDER BY b.start ASC ")
     List<BookingClosest> findNextClosestBookingByOwnerId(long ownerId, long itemId);
 
     @Query("SELECT new ru.practicum.shareit.booking.dto.BookingClosest(b.id, b.booker.id) " +
