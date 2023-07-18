@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -216,26 +215,18 @@ class BookingDataJpaTest {
     @Test
     @SneakyThrows
     void findNextClosestBookingByOwnerId() {
-        Booking nextBooking = bookingRepository
-                .findBookingsByItemOwnerIdAndStatusAndItemOrderByStartDesc(ownerId, itemId)
-                .stream()
-                .filter(b -> b.getStart().isAfter(LocalDateTime.now()))
-                .collect(Collectors.toList())
+        BookingClosest next = bookingRepository
+                .findNextClosestBookingByOwnerId(ownerId, itemId)
                 .get(0);
 
-        BookingClosest nextBookingClosest = new BookingClosest(nextBooking.getId(), nextBooking.getBooker().getId());
-
-        assertEquals(nextBookingClosest.getBookerId(), bookerId);
+        assertEquals(next.getBookerId(), bookerId);
     }
 
     @Test
     @SneakyThrows
     void findLastClosestBookingByOwnerId() {
-        List<Booking> last = bookingRepository
-                .findBookingsByItemOwnerIdAndStatusAndItemOrderByStartAsc(ownerId, itemId)
-                .stream()
-                .filter(b -> b.getStart().isBefore(LocalDateTime.now()))
-                .collect(Collectors.toList());
+        List<BookingClosest> last = bookingRepository
+                .findLastClosestBookingByOwnerId(ownerId, itemId);
 
         assertEquals(last.size(), 0);
     }

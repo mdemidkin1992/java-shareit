@@ -26,7 +26,6 @@ import ru.practicum.shareit.util.exception.ItemNotFoundException;
 import ru.practicum.shareit.util.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.util.exception.UserNotFoundException;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -75,46 +74,24 @@ public class ItemServiceImpl implements ItemService {
 
         if (itemDto.getOwnerId() == ownerId) {
 
-            List<Booking> nextBookingClosest = bookingRepository
-                    .findBookingsByItemOwnerIdAndStatusAndItemOrderByStartAsc(
+            List<BookingClosest> nextBookingClosest = bookingRepository
+                    .findNextClosestBookingByOwnerId(
                             ownerId,
                             itemId
                     );
 
-            List<Booking> lastBookingClosest = bookingRepository
-                     .findBookingsByItemOwnerIdAndStatusAndItemOrderByStartDesc(
-                             ownerId,
-                             itemId
-                     );
+            List<BookingClosest> lastBookingClosest = bookingRepository
+                    .findLastClosestBookingByOwnerId(
+                            ownerId,
+                            itemId
+                    );
 
             if (!nextBookingClosest.isEmpty()) {
-                List<Booking> nextBooking = nextBookingClosest.stream()
-                        .filter(b -> b.getStart().isAfter(LocalDateTime.now()))
-                        .collect(Collectors.toList());
-
-                if (!nextBooking.isEmpty()) {
-                    itemDto.setNextBooking(
-                            new BookingClosest(
-                                    nextBooking.get(0).getId(),
-                                    nextBooking.get(0).getBooker().getId()
-                            )
-                    );
-                }
+                itemDto.setNextBooking(nextBookingClosest.get(0));
             }
 
             if (!lastBookingClosest.isEmpty()) {
-                List<Booking> lastBooking = lastBookingClosest.stream()
-                        .filter(b -> b.getStart().isBefore(LocalDateTime.now()))
-                        .collect(Collectors.toList());
-
-                if (!lastBooking.isEmpty()) {
-                    itemDto.setLastBooking(
-                            new BookingClosest(
-                                    lastBooking.get(0).getId(),
-                                    lastBooking.get(0).getBooker().getId()
-                            )
-                    );
-                }
+                itemDto.setLastBooking(lastBookingClosest.get(0));
             }
         }
 
@@ -132,47 +109,26 @@ public class ItemServiceImpl implements ItemService {
 
         for (ItemDto i : itemDtos) {
 
-            List<Booking> nextBookingClosest = bookingRepository
-                    .findBookingsByItemOwnerIdAndStatusAndItemOrderByStartAsc(
+            List<BookingClosest> nextBookingClosest = bookingRepository
+                    .findNextClosestBookingByOwnerId(
                             ownerId,
                             i.getId()
                     );
 
-            List<Booking> lastBookingClosest = bookingRepository
-                    .findBookingsByItemOwnerIdAndStatusAndItemOrderByStartDesc(
+            List<BookingClosest> lastBookingClosest = bookingRepository
+                    .findLastClosestBookingByOwnerId(
                             ownerId,
                             i.getId()
                     );
 
             if (!nextBookingClosest.isEmpty()) {
-                List<Booking> nextBooking = nextBookingClosest.stream()
-                        .filter(b -> b.getStart().isAfter(LocalDateTime.now()))
-                        .collect(Collectors.toList());
-
-                if (!nextBooking.isEmpty()) {
-                    i.setNextBooking(
-                            new BookingClosest(
-                                    nextBooking.get(0).getId(),
-                                    nextBooking.get(0).getBooker().getId()
-                            )
-                    );
-                }
+                i.setNextBooking(nextBookingClosest.get(0));
             }
 
             if (!lastBookingClosest.isEmpty()) {
-                List<Booking> lastBooking = lastBookingClosest.stream()
-                        .filter(b -> b.getStart().isBefore(LocalDateTime.now()))
-                        .collect(Collectors.toList());
-
-                if (!lastBooking.isEmpty()) {
-                    i.setLastBooking(
-                            new BookingClosest(
-                                    lastBooking.get(0).getId(),
-                                    lastBooking.get(0).getBooker().getId()
-                            )
-                    );
-                }
+                i.setLastBooking(lastBookingClosest.get(0));
             }
+
 
         }
 

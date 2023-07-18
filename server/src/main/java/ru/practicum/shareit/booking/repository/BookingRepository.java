@@ -4,6 +4,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import ru.practicum.shareit.booking.dto.BookingClosest;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.StatusType;
 
@@ -63,19 +64,22 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByItemOwnerIdAndStatusOrderByStartDesc(long ownerId, StatusType status, Pageable pageable);
 
-    @Query("SELECT b FROM Booking b " +
+    @Query("SELECT new ru.practicum.shareit.booking.dto.BookingClosest(b.id, b.booker.id) " +
+            "FROM Booking AS b " +
             "WHERE b.item.owner.id = :ownerId " +
             "AND b.status = 'APPROVED' " +
             "AND b.item.id = :itemId " +
+            "AND b.start > CURRENT_TIMESTAMP " +
             "ORDER BY b.start ASC ")
-    List<Booking> findBookingsByItemOwnerIdAndStatusAndItemOrderByStartAsc(long ownerId, long itemId);
+    List<BookingClosest> findNextClosestBookingByOwnerId(long ownerId, long itemId);
 
-
-    @Query("SELECT b FROM Booking b " +
+    @Query("SELECT new ru.practicum.shareit.booking.dto.BookingClosest(b.id, b.booker.id) " +
+            "FROM Booking AS b " +
             "WHERE b.item.owner.id = :ownerId " +
             "AND b.status = 'APPROVED' " +
             "AND b.item.id = :itemId " +
+            "AND b.start < CURRENT_TIMESTAMP " +
             "ORDER BY b.start DESC ")
-    List<Booking> findBookingsByItemOwnerIdAndStatusAndItemOrderByStartDesc(long ownerId, long itemId);
+    List<BookingClosest> findLastClosestBookingByOwnerId(long ownerId, long itemId);
 
 }
