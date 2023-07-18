@@ -70,7 +70,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "AND b.status = 'APPROVED' " +
             "AND b.item.id = :itemId " +
             "AND b.start > CURRENT_TIMESTAMP " +
-            "ORDER BY b.start ASC ")
+            "ORDER BY b.start DESC ")
     List<BookingClosest> findNextClosestBookingByOwnerId(long ownerId, long itemId);
 
     @Query("SELECT new ru.practicum.shareit.booking.dto.BookingClosest(b.id, b.booker.id) " +
