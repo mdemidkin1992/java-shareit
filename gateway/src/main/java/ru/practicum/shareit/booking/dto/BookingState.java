@@ -8,7 +8,7 @@ public enum BookingState {
 	REJECTED("Бронирование отклонено владельцем."),
 	CANCELED("Бронирование отменено создателем.");
 
-	public final String description;
+	private final String description;
 
 	BookingState(String description) {
 		this.description = description;

@@ -11,7 +11,7 @@ import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.StatusType;
+import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -44,7 +44,7 @@ public class BookingServiceImpl implements BookingService {
             throw new BookingNotFoundException("Owner can't book it's own item");
 
         Booking booking = BookingMapper.fromBookingDtoRequest(bookingDto, booker, item);
-        booking.setStatus(StatusType.WAITING);
+        booking.setStatus(BookingState.WAITING);
         booking = bookingRepository.save(booking);
         return BookingMapper.toBookingDto(booking);
     }
@@ -65,8 +65,8 @@ public class BookingServiceImpl implements BookingService {
 
         bookingRepository.updateBookingStatusById(bookingId, approved);
         BookingDtoResponse dto = BookingMapper.toBookingDto((Objects.requireNonNull(bookingRepository.findById(bookingId).orElse(null))));
-        if (approved) dto.setStatus(String.valueOf(StatusType.APPROVED));
-        else dto.setStatus(String.valueOf(StatusType.REJECTED));
+        if (approved) dto.setStatus(String.valueOf(BookingState.APPROVED));
+        else dto.setStatus(String.valueOf(BookingState.REJECTED));
         return dto;
     }
 
@@ -105,7 +105,7 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case "WAITING":
             case "REJECTED":
-                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, StatusType.valueOf(state), page);
+                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingState.valueOf(state), page);
                 break;
             default:
                 throw new UnsupportedStateException("Unknown state: " + state);
@@ -137,7 +137,7 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case "WAITING":
             case "REJECTED":
-                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, StatusType.valueOf(state), page);
+                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingState.valueOf(state), page);
                 break;
             default:
                 throw new UnsupportedStateException("Unknown state: " + state);

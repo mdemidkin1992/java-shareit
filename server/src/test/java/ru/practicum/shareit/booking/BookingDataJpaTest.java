@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.dto.BookingClosest;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.StatusType;
+import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -69,21 +69,21 @@ class BookingDataJpaTest {
         Booking booking1 = new Booking();
         booking1.setItem(item);
         booking1.setBooker(booker);
-        booking1.setStatus(StatusType.WAITING);
+        booking1.setStatus(BookingState.WAITING);
         booking1.setStart(LocalDateTime.of(2023, 10, 1, 9, 0, 30));
         booking1.setEnd(LocalDateTime.of(2023, 10, 2, 9, 0, 30));
 
         Booking booking2 = new Booking();
         booking2.setItem(item);
         booking2.setBooker(booker);
-        booking2.setStatus(StatusType.WAITING);
+        booking2.setStatus(BookingState.WAITING);
         booking2.setStart(LocalDateTime.of(2023, 10, 1, 9, 0, 30));
         booking2.setEnd(LocalDateTime.of(2023, 10, 2, 9, 0, 30));
 
         Booking booking3 = new Booking();
         booking3.setItem(item);
         booking3.setBooker(booker);
-        booking3.setStatus(StatusType.WAITING);
+        booking3.setStatus(BookingState.WAITING);
         booking3.setStart(LocalDateTime.of(2023, 10, 1, 9, 0, 30));
         booking3.setEnd(LocalDateTime.of(2023, 10, 2, 9, 0, 30));
 
@@ -118,7 +118,7 @@ class BookingDataJpaTest {
         List<Booking> actual = bookingRepository
                 .findAllByBookerIdAndStatusOrderByStartDesc(
                                 bookerId,
-                                StatusType.REJECTED,
+                                BookingState.REJECTED,
                                 PAGE
                         );
         List<Booking> expect = new ArrayList<>();
@@ -204,7 +204,7 @@ class BookingDataJpaTest {
         List<Booking> actual = bookingRepository
                 .findAllByItemOwnerIdAndStatusOrderByStartDesc(
                                 ownerId,
-                                StatusType.REJECTED,
+                                BookingState.REJECTED,
                                 PAGE
                         );
         List<Booking> expect = new ArrayList<>();

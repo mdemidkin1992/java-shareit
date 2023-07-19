@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.dto.BookingClosest;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.StatusType;
+import ru.practicum.shareit.booking.model.BookingState;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByBookerIdOrderByStartDesc(long bookerId, Pageable pageable);
 
-    List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(long bookerId, StatusType status, Pageable pageable);
+    List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(long bookerId, BookingState status, Pageable pageable);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.booker.id = :bookerId " +
@@ -62,7 +62,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "ORDER BY b.start DESC")
     List<Booking> findAllByItemOwnerIdFutureOrderByStartDesc(long ownerId, Pageable pageable);
 
-    List<Booking> findAllByItemOwnerIdAndStatusOrderByStartDesc(long ownerId, StatusType status, Pageable pageable);
+    List<Booking> findAllByItemOwnerIdAndStatusOrderByStartDesc(long ownerId, BookingState status, Pageable pageable);
 
     @Query("SELECT new ru.practicum.shareit.booking.dto.BookingClosest(b.id, b.booker.id) " +
             "FROM Booking AS b " +

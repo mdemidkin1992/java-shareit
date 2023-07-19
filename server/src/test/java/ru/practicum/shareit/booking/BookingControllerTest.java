@@ -11,7 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
-import ru.practicum.shareit.booking.model.StatusType;
+import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.util.CrudOperations;
@@ -187,7 +187,7 @@ class BookingControllerTest extends CrudOperations {
                         .header("X-Sharer-User-Id", String.valueOf(ownerId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(response.getId()))
-                .andExpect(jsonPath("$.status").value(String.valueOf(StatusType.REJECTED)))
+                .andExpect(jsonPath("$.status").value(String.valueOf(BookingState.REJECTED)))
                 .andReturn();
 
         mockMvc.perform(patch("/bookings/{bookingId}", response.getId())
@@ -268,7 +268,7 @@ class BookingControllerTest extends CrudOperations {
                         .header("X-Sharer-User-Id", String.valueOf(ownerId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(response1.getId()))
-                .andExpect(jsonPath("$.status").value(String.valueOf(StatusType.APPROVED)))
+                .andExpect(jsonPath("$.status").value(String.valueOf(BookingState.APPROVED)))
                 .andReturn();
 
         response1.setStatus("APPROVED");
@@ -279,7 +279,7 @@ class BookingControllerTest extends CrudOperations {
                         .header("X-Sharer-User-Id", String.valueOf(ownerId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(response2.getId()))
-                .andExpect(jsonPath("$.status").value(String.valueOf(StatusType.REJECTED)))
+                .andExpect(jsonPath("$.status").value(String.valueOf(BookingState.REJECTED)))
                 .andReturn();
 
         response2.setStatus("REJECTED");
@@ -290,7 +290,7 @@ class BookingControllerTest extends CrudOperations {
                         .header("X-Sharer-User-Id", String.valueOf(ownerId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(response3.getId()))
-                .andExpect(jsonPath("$.status").value(String.valueOf(StatusType.REJECTED)))
+                .andExpect(jsonPath("$.status").value(String.valueOf(BookingState.REJECTED)))
                 .andReturn();
 
         response3.setStatus("REJECTED");
@@ -444,7 +444,7 @@ class BookingControllerTest extends CrudOperations {
                         .header("X-Sharer-User-Id", String.valueOf(ownerId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(response1.getId()))
-                .andExpect(jsonPath("$.status").value(String.valueOf(StatusType.APPROVED)))
+                .andExpect(jsonPath("$.status").value(String.valueOf(BookingState.APPROVED)))
                 .andReturn();
 
         response1.setStatus("APPROVED");
@@ -455,7 +455,7 @@ class BookingControllerTest extends CrudOperations {
                         .header("X-Sharer-User-Id", String.valueOf(ownerId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(response2.getId()))
-                .andExpect(jsonPath("$.status").value(String.valueOf(StatusType.REJECTED)))
+                .andExpect(jsonPath("$.status").value(String.valueOf(BookingState.REJECTED)))
                 .andReturn();
 
         response2.setStatus("REJECTED");
@@ -466,7 +466,7 @@ class BookingControllerTest extends CrudOperations {
                         .header("X-Sharer-User-Id", String.valueOf(ownerId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(response3.getId()))
-                .andExpect(jsonPath("$.status").value(String.valueOf(StatusType.REJECTED)))
+                .andExpect(jsonPath("$.status").value(String.valueOf(BookingState.REJECTED)))
                 .andReturn();
 
         response3.setStatus("REJECTED");

@@ -12,7 +12,7 @@ import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.StatusType;
+import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.item.model.Item;
@@ -65,7 +65,7 @@ class BookingServiceUnitTest {
         request.setStart(LocalDateTime.now());
         request.setEnd(LocalDateTime.now().plusHours(1));
         Booking booking = BookingMapper.fromBookingDtoRequest(request, booker, item);
-        booking.setStatus(StatusType.WAITING);
+        booking.setStatus(BookingState.WAITING);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(booker));
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
@@ -97,7 +97,7 @@ class BookingServiceUnitTest {
         request.setStart(LocalDateTime.now());
         request.setEnd(LocalDateTime.now().plusHours(1));
         Booking booking = BookingMapper.fromBookingDtoRequest(request, booker, item);
-        booking.setStatus(StatusType.WAITING);
+        booking.setStatus(BookingState.WAITING);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(booker));
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
@@ -129,7 +129,7 @@ class BookingServiceUnitTest {
         request.setStart(LocalDateTime.now());
         request.setEnd(LocalDateTime.now().plusHours(1));
         Booking booking = BookingMapper.fromBookingDtoRequest(request, booker, item);
-        booking.setStatus(StatusType.WAITING);
+        booking.setStatus(BookingState.WAITING);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(booker));
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
@@ -234,7 +234,7 @@ class BookingServiceUnitTest {
         Booking booking = BookingMapper.fromBookingDtoRequest(request, booker, item);
         long bookingId = 1L;
         booking.setId(bookingId);
-        booking.setStatus(StatusType.APPROVED);
+        booking.setStatus(BookingState.APPROVED);
 
         when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
@@ -270,7 +270,7 @@ class BookingServiceUnitTest {
         Booking booking1 = BookingMapper.fromBookingDtoRequest(request1, booker, item);
         long bookingId1 = 1L;
         booking1.setId(bookingId1);
-        booking1.setStatus(StatusType.APPROVED);
+        booking1.setStatus(BookingState.APPROVED);
 
         BookingDtoRequest request2 = new BookingDtoRequest();
         request2.setItemId(itemId);
@@ -279,7 +279,7 @@ class BookingServiceUnitTest {
         Booking booking2 = BookingMapper.fromBookingDtoRequest(request2, booker, item);
         long bookingId2 = 2L;
         booking2.setId(bookingId2);
-        booking2.setStatus(StatusType.REJECTED);
+        booking2.setStatus(BookingState.REJECTED);
 
         BookingDtoRequest request3 = new BookingDtoRequest();
         request3.setItemId(itemId);
@@ -288,7 +288,7 @@ class BookingServiceUnitTest {
         Booking booking3 = BookingMapper.fromBookingDtoRequest(request3, booker, item);
         long bookingId3 = 3L;
         booking3.setId(bookingId3);
-        booking3.setStatus(StatusType.WAITING);
+        booking3.setStatus(BookingState.WAITING);
 
         when(userRepository.findById(bookerId)).thenReturn(Optional.of(booker));
         when(bookingRepository.findAllByBookerIdOrderByStartDesc(bookerId, page))
@@ -299,7 +299,7 @@ class BookingServiceUnitTest {
                 .thenReturn(Collections.emptyList());
         when(bookingRepository.findAllByBookerIdFuture(bookerId, page))
                 .thenReturn(Collections.emptyList());
-        when(bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(bookerId, StatusType.REJECTED, page))
+        when(bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(bookerId, BookingState.REJECTED, page))
                 .thenReturn(List.of(booking3));
 
         List<BookingDtoResponse> expectedList1 = BookingMapper.toBookingDto(List.of(booking1, booking2, booking3));
@@ -352,7 +352,7 @@ class BookingServiceUnitTest {
         Booking booking1 = BookingMapper.fromBookingDtoRequest(request1, booker, item);
         long bookingId1 = 1L;
         booking1.setId(bookingId1);
-        booking1.setStatus(StatusType.APPROVED);
+        booking1.setStatus(BookingState.APPROVED);
 
         BookingDtoRequest request2 = new BookingDtoRequest();
         request2.setItemId(itemId);
@@ -361,7 +361,7 @@ class BookingServiceUnitTest {
         Booking booking2 = BookingMapper.fromBookingDtoRequest(request2, booker, item);
         long bookingId2 = 2L;
         booking2.setId(bookingId2);
-        booking2.setStatus(StatusType.REJECTED);
+        booking2.setStatus(BookingState.REJECTED);
 
         BookingDtoRequest request3 = new BookingDtoRequest();
         request3.setItemId(itemId);
@@ -370,7 +370,7 @@ class BookingServiceUnitTest {
         Booking booking3 = BookingMapper.fromBookingDtoRequest(request3, booker, item);
         long bookingId3 = 3L;
         booking3.setId(bookingId3);
-        booking3.setStatus(StatusType.WAITING);
+        booking3.setStatus(BookingState.WAITING);
 
         when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
         when(bookingRepository.findAllByItemOwnerIdOrderByStartDesc(ownerId, page))
@@ -381,7 +381,7 @@ class BookingServiceUnitTest {
                 .thenReturn(Collections.emptyList());
         when(bookingRepository.findAllByItemOwnerIdFutureOrderByStartDesc(ownerId, page))
                 .thenReturn(Collections.emptyList());
-        when(bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(ownerId, StatusType.REJECTED, page))
+        when(bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(ownerId, BookingState.REJECTED, page))
                 .thenReturn(List.of(booking3));
 
         List<BookingDtoResponse> expectedList1 = BookingMapper.toBookingDto(List.of(booking1, booking2, booking3));
@@ -431,7 +431,7 @@ class BookingServiceUnitTest {
         Booking booking = BookingMapper.fromBookingDtoRequest(request, booker, item);
         long bookingId = 1L;
         booking.setId(bookingId);
-        booking.setStatus(StatusType.WAITING);
+        booking.setStatus(BookingState.WAITING);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(booker));
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
@@ -464,7 +464,7 @@ class BookingServiceUnitTest {
         Booking booking = BookingMapper.fromBookingDtoRequest(request, booker, item);
         long bookingId = 1L;
         booking.setId(bookingId);
-        booking.setStatus(StatusType.WAITING);
+        booking.setStatus(BookingState.WAITING);
         booking.setBooker(owner);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(owner));

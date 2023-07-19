@@ -11,7 +11,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.StatusType;
+import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
@@ -239,7 +239,7 @@ class ItemControllerTest extends CrudOperations {
         Booking booking = new Booking();
         booking.setItem(item.get());
         booking.setBooker(booker.get());
-        booking.setStatus(StatusType.WAITING);
+        booking.setStatus(BookingState.WAITING);
         booking.setStart(LocalDateTime.of(2023, 6, 1, 9, 0, 30));
         booking.setEnd(LocalDateTime.of(2023, 6, 2, 9, 0, 30));
 
